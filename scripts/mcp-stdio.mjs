@@ -1,0 +1,14 @@
+import {Client} from '@modelcontextprotocol/sdk/client/index.js';
+import {StreamableHTTPClientTransport} from '@modelcontextprotocol/sdk/client/streamableHttp.js';
+import {Server} from '@modelcontextprotocol/sdk/server/index.js';
+import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
+import {ListToolsRequestSchema,CallToolRequestSchema} from '@modelcontextprotocol/sdk/types.js';
+import {loadCredentials,port} from '../server/config.mjs';
+const client=new Client({name:'paper-studio-stdio',version:'1.0.0'});
+const token=process.env.MCP_TOKEN||loadCredentials().mcp_token;
+await client.connect(new StreamableHTTPClientTransport(new URL(process.env.MCP_URL||`http://127.0.0.1:${port}/mcp`),{requestInit:{headers:{Authorization:`Bearer ${token}`}}}));
+const server=new Server({name:'paper-studio',version:'1.0.0'},{capabilities:{tools:{}}});
+server.setRequestHandler(ListToolsRequestSchema,()=>client.listTools());
+server.setRequestHandler(CallToolRequestSchema,request=>client.callTool(request.params,undefined,{timeout:120000}));
+await server.connect(new StdioServerTransport());
+process.stdin.on('end',async()=>{await client.close();await server.close()});

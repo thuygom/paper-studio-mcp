@@ -1,0 +1,16 @@
+*
+!package.json
+!package-lock.json
+!index.html
+!vite.config.js
+!src/
+!src/**
+!server/
+!server/**
+!scripts/
+!scripts/**
+!tests/
+!tests/**
+!deploy/
+!deploy/Dockerfile.tex
+!deploy/compile-project.sh
