@@ -5,6 +5,28 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import yazl from 'yazl';
 import { createService,safePath } from '../server/service.mjs';
+test('ZIP import unwraps folders, ignores metadata and detects the complete document and compiler',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'paper-zip-')),s=createService(dir);
+ async function zip(files){const archive=new yazl.ZipFile();for(const [path,content] of files)archive.addBuffer(Buffer.from(content),path);archive.end();const chunks=[];for await(const c of archive.outputStream)chunks.push(c);return Buffer.concat(chunks).toString('base64');}
+ try{
+  const source=[['bundle/main.tex','% supporting file'],['bundle/meeting.tex','\\documentclass{article}\n\\usepackage{fontspec}'],['bundle/sections/intro.tex','\\section{Intro}'],['bundle/.DS_Store','metadata'],['__MACOSX/bundle/._meeting.tex','metadata']];
+  const p=await s.importZip({name:'Meeting',base64:await zip(source)});
+  assert.equal(p.root,'meeting.tex');assert.equal(p.engine,'xelatex');
+  assert.deepEqual(s.listFiles(p.id).map(f=>f.path),['main.tex','meeting.tex','sections/intro.tex']);
+  const count=s.listProjects().length;
+  for(const files of [[['notes.txt','no document']],[['main.tex','\\documentclass{article}'],['main.tex','duplicate']]])await assert.rejects(s.importZip({name:'Invalid',base64:await zip(files)}),{status:400});
+  assert.equal(s.listProjects().length,count);
+ }finally{s.db.close();rmSync(dir,{recursive:true,force:true});}
+});
+test('base64 uploads accept large assets and reject malformed padding',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'paper-base64-')),s=createService(dir);
+ try{
+  const p=s.createProject({name:'Large asset',starter:false}),data=Buffer.alloc(8*1024*1024+1,0xfa),content=data.toString('base64');
+  assert.equal(s.writeFile(p.id,{path:'font.bin',content,encoding:'base64',expectedRevision:null}).size,data.length);
+  assert.equal(s.readFile(p.id,'font.bin').content,content);
+  for(const content of ['A','AAA','A===','AA=A','AAAA====','AA!A','AAAA\n','AAA\n','AAA\r','AAA\u2028','AAA\u2029'])assert.throws(()=>s.writeFile(p.id,{path:'invalid.bin',content,encoding:'base64',expectedRevision:null}),{status:400});
+ }finally{s.db.close();rmSync(dir,{recursive:true,force:true});}
+});
 test('paper files enforce paths, revisions, history, ZIP roundtrip and project boundaries',async()=>{
  const dir=mkdtempSync(join(tmpdir(),'paper-test-')),s=createService(dir);
  try{

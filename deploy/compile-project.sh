@@ -9,9 +9,9 @@ case "$1" in
 esac
 cat > /tmp/source.zip
 unzip -q /tmp/source.zip -d /work
-cd /work
+cd "/work/$(dirname -- "$2")"
 set +e
-latexmk -norc "$engine" -interaction=nonstopmode -halt-on-error -file-line-error -no-shell-escape "$2" > /tmp/compiler.log 2>&1
+latexmk -norc "$engine" -interaction=nonstopmode -halt-on-error -file-line-error -no-shell-escape "./${2##*/}" > /tmp/compiler.log 2>&1
 compile_status=$?
 set -e
 result_dir=/tmp/result
