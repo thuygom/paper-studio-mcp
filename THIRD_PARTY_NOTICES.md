@@ -21,7 +21,7 @@ Transitive JavaScript packages in the initial lockfile declare MIT, ISC, BSD-2-C
 
 ## Runtime and compiler images
 
-Node.js, the Docker CLI, Debian packages, TeX Live, Biber and Noto fonts have their own upstream licenses. The compiler image installs Debian's unmodified packages; installed package copyright files are available under `/usr/share/doc/*/copyright`. TeX packages and fonts may carry LPPL, GPL, OFL or other licenses, and are not relicensed as MIT by this project.
+Node.js, the Docker CLI, Debian packages, TeX Live, Biber, Noto and Tinos/Croscore fonts have their own upstream licenses. The compiler image installs Debian's unmodified packages; installed package copyright files are available under `/usr/share/doc/*/copyright`. TeX packages and fonts may carry LPPL, GPL, OFL or other licenses, and are not relicensed as MIT by this project.
 
 This repository distributes Docker build recipes rather than vendored TeX binaries. If you redistribute built images, review and satisfy the included packages' redistribution and source-availability requirements. You can list installed packages with `dpkg-query -W` inside the image.
 

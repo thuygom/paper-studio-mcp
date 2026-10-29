@@ -33,6 +33,16 @@ To choose your email or port, copy `.env.example` to `.env` and edit it **before
 
 There is one owner account per installation. This does not provide shared multi-user editing, OAuth, comments, tracked changes or SyncTeX. Use separate installations for separate owners.
 
+## Upload a document
+
+Choose **Upload files** for `.tex` sources and supporting files. A complete LaTeX document defaults to **Create a new paper**; supporting files default to the current paper. Review the destination, main document and compiler before uploading. `fontspec` and `xeCJK` suggest XeLaTeX; TeX program directives take priority. Confirm replacement explicitly for existing filenames; revision checks and history still apply.
+
+A single ZIP selected through either upload control imports a new project. Common wrapper folders and macOS metadata are removed, and complete documents are preferred over LaTeX fragments. Project settings open for review after import. Nested main documents compile relative to their own directory. A PDF from a different main document or compiler is hidden until you compile the current selection; **Use as main** also switches the document directly from the editor.
+
+Tinos/Croscore and Noto CJK fonts are included in new compiler images. For other custom fonts, upload the font files and reference their project paths with `fontspec`. Existing installations need to rebuild the compiler image to receive new fonts and packages.
+
+The source editor supports mouse and Shift selection, clipboard commands, undo/redo and Tab/Shift+Tab indentation. Ctrl/Cmd+B and I format the selection; Ctrl/Cmd+S saves and Ctrl/Cmd+Enter compiles. Toolbar actions retain the selection and return focus to the editor. Delayed responses from the editor's own saves are ignored during synchronization. If another writer changes the same file, **Keep my edits** can save the local version after review; the previous server version remains in history.
+
 ## Connect an agent
 
 Sign in, choose **MCP connection**, reveal the connection configuration and test it. Copy the configuration into a client that supports Streamable HTTP and Bearer headers. Client-specific configuration keys may differ.

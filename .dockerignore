@@ -7,6 +7,8 @@
 !src/**
 !server/
 !server/**
+!shared/
+!shared/**
 !scripts/
 !scripts/**
 !tests/
